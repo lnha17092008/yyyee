@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nihongo Master Game - Bài 1 đến Bài 3</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    @keyframes pulse-green {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-pulse-green {
+      animation: pulse-green 0.3s ease-in-out;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-rose-500/20">
+          あ
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight text-white">Nihongo Master Game</h1>
+          <p class="text-xs text-slate-400">Từ vựng Minna no Nihongo (Bài 1 - 3)</p>
+        </div>
+      </div>
+
+      <!-- Stats / Score -->
+      <div class="flex items-center gap-4">
+        <div class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-amber-400"></i>
+          <span class="text-sm font-bold text-amber-400" id="totalScore">0</span>
+          <span class="text-xs text-slate-400">điểm</span>
+        </div>
+        <div class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-fire text-orange-500"></i>
+          <span class="text-sm font-bold text-orange-500" id="streakCount">0</span>
+          <span class="text-xs text-slate-400">chuỗi</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 flex flex-col gap-6">
+
+    <!-- Mode Selector Tabs -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-800 p-1.5 rounded-2xl border border-slate-700">
+      <button onclick="switchMode('matching')" id="tab-matching" class="tab-btn active py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-indigo-600 text-white shadow-md">
+        <i class="fa-solid fa-link"></i> Nối Từ
+      </button>
+      <button onclick="switchMode('quiz')" id="tab-quiz" class="tab-btn py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200">
+        <i class="fa-solid fa-bolt"></i> Trắc Nghiệm
+      </button>
+      <button onclick="switchMode('memory')" id="tab-memory" class="tab-btn py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200">
+        <i class="fa-solid fa-clone"></i> Lật Thẻ
+      </button>
+      <button onclick="switchMode('typing')" id="tab-typing" class="tab-btn py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200">
+        <i class="fa-solid fa-keyboard"></i> Gõ Chữ
+      </button>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+      <span class="text-slate-400 whitespace-nowrap"><i class="fa-solid fa-filter mr-1"></i>Chủ đề:</span>
+      <button onclick="filterCategory('ALL')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-rose-500 text-white font-medium whitespace-nowrap">Tất cả</button>
+      <button onclick="filterCategory('Bài 1')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 1: Xưng hô & Nghề nghiệp</button>
+      <button onclick="filterCategory('Bài 2')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 2: Đồ vật & Chỉ thị</button>
+      <button onclick="filterCategory('Bài 3')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 3: Địa điểm & Con số</button>
+      <button onclick="filterCategory('Bài 4')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 4: Thời gian và động từ</button>
+    </div>
+
+    <!-- GAME MODE 1: MATCHING PAIRS -->
+    <section id="mode-matching" class="game-mode flex-1 flex flex-col">
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-bold text-lg text-white">Chế độ Nối Từ</h2>
+            <p class="text-xs text-slate-400">Chọn 1 từ tiếng Nhật và nối với nghĩa tiếng Việt tương ứng</p>
+          </div>
+          <button onclick="initMatchingGame()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right"></i> Ván mới
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 sm:gap-6 my-auto">
+          <div class="flex flex-col gap-3" id="match-ja-list"></div>
+          <div class="flex flex-col gap-3" id="match-vi-list"></div>
+        </div>
+
+        <div class="mt-6 text-center text-xs text-slate-400" id="match-progress">
+          Ghép đúng tất cả các cặp để hoàn thành màn chơi!
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME MODE 2: SPEED QUIZ -->
+    <section id="mode-quiz" class="game-mode hidden flex-1 flex flex-col">
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col justify-between relative overflow-hidden">
+        <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-6">
+          <div id="quiz-timer-bar" class="bg-gradient-to-r from-emerald-500 to-rose-500 h-full w-full transition-all duration-100 ease-linear"></div>
+        </div>
+
+        <div class="text-center my-auto py-6">
+          <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 px-3 py-1 rounded-full text-indigo-400 text-xs font-semibold mb-3" id="quiz-category">
+            Bài 1
+          </div>
+          
+          <div class="flex items-center justify-center gap-3">
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-wide" id="quiz-question-text">
+              せんせい
+            </h2>
+            <button onclick="speakCurrentWord()" class="w-10 h-10 rounded-full bg-slate-700 hover:bg-slate-600 text-indigo-400 flex items-center justify-center transition" title="Nghe phát âm">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
+          
+          <p class="text-sm text-slate-400 mt-2">Chọn nghĩa đúng nhất:</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4" id="quiz-options-container"></div>
+      </div>
+    </section>
+
+    <!-- GAME MODE 3: MEMORY FLIP -->
+    <section id="mode-memory" class="game-mode hidden flex-1 flex flex-col">
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-bold text-lg text-white">Chế độ Lật Thẻ Ghi Nhớ</h2>
+            <p class="text-xs text-slate-400">Lật 2 thẻ có từ và nghĩa tương ứng để tạo thành cặp</p>
+          </div>
+          <button onclick="initMemoryGame()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right"></i> Chia lại thẻ
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 my-auto" id="memory-grid"></div>
+
+        <div class="mt-4 text-center text-xs text-slate-400" id="memory-status">
+          Số lượt thử: <span id="memory-moves" class="font-bold text-slate-200">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME MODE 4: TYPING PRACTICE -->
+    <section id="mode-typing" class="game-mode hidden flex-1 flex flex-col">
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 flex-1 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="font-bold text-lg text-white">Chế độ Kiểm Tra Gõ Chữ</h2>
+            <p class="text-xs text-slate-400">Nhìn nghĩa tiếng Việt và gõ từ tiếng Nhật tương ứng</p>
+          </div>
+          <button onclick="initTypingGame()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-forward"></i> Đổi từ khác
+          </button>
+        </div>
+
+        <div class="text-center my-auto py-6 max-w-md mx-auto w-full">
+          <div class="inline-flex items-center gap-2 bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-full text-rose-400 text-xs font-semibold mb-3" id="typing-category">
+            Bài 1
+          </div>
+          
+          <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6" id="typing-vi-question">
+            Thầy / Cô giáo
+          </h3>
+
+          <form onsubmit="checkTypingAnswer(event)" class="flex flex-col gap-3">
+            <div class="relative">
+              <input type="text" id="typing-input" autocomplete="off" placeholder="Gõ tiếng Nhật vào đây..." class="w-full px-4 py-3.5 bg-slate-900 border-2 border-slate-700 focus:border-indigo-500 rounded-xl text-white text-center text-lg font-medium outline-none transition placeholder:text-slate-600">
+            </div>
+
+            <div class="flex gap-2">
+              <button type="button" onclick="showTypingHint()" class="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm rounded-xl transition">
+                <i class="fa-solid fa-lightbulb"></i> Gợi ý
+              </button>
+              <button type="submit" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl shadow-lg transition">
+                Kiểm tra <i class="fa-solid fa-paper-plane ml-1"></i>
+              </button>
+            </div>
+          </form>
+
+          <!-- Feedback message -->
+          <div id="typing-feedback" class="mt-4 text-sm font-semibold min-h-[24px]"></div>
+        </div>
+
+        <div class="text-center text-xs text-slate-400">
+          Mẹo: Bạn có thể gõ bằng bàn phím tiếng Nhật (Hiragana/Katakana) trên điện thoại hoặc máy tính.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // --- VOCABULARY DATABASE (BÀI 1, 2, 3) ---
+    const ALL_VOCAB = [
+      // Bài 1
+      { ja: "わたし", vi: "Tôi", cat: "Bài 1" },
+      { ja: "わたしたち", vi: "Chúng tôi, chúng ta", cat: "Bài 1" },
+      { ja: "あなた", vi: "Anh, chị, ông, bà, bạn...", cat: "Bài 1" },
+      { ja: "あのひと", vi: "Người kia", cat: "Bài 1" },
+      { ja: "あのかた", vi: "Vị kia", cat: "Bài 1" },
+      { ja: "みなさん", vi: "Các anh chị, các ông bà, quý vị", cat: "Bài 1" },
+      { ja: "～さん", vi: "Ông, bà, anh, chị ~", cat: "Bài 1" },
+      { ja: "～ちゃん", vi: "Bé ~", cat: "Bài 1" },
+      { ja: "～くん", vi: "Bé ~ (bé trai)", cat: "Bài 1" },
+      { ja: "～じん", vi: "Người nước~", cat: "Bài 1" },
+      { ja: "せんせい", vi: "Thầy/cô (dùng để gọi)", cat: "Bài 1" },
+      { ja: "きょうし", vi: "Giáo viên (nghề nghiệp)", cat: "Bài 1" },
+      { ja: "がくせい", vi: "Học sinh, sinh viên", cat: "Bài 1" },
+      { ja: "かいしゃいん", vi: "Nhân viên công ty (chung)", cat: "Bài 1" },
+      { ja: "しゃいん", vi: "Nhân viên công ty ~ (cụ thể)", cat: "Bài 1" },
+      { ja: "ぎんこういん", vi: "Nhân viên ngân hàng", cat: "Bài 1" },
+      { ja: "いしゃ", vi: "Bác sĩ", cat: "Bài 1" },
+      { ja: "けんきゅうしゃ", vi: "Nhà nghiên cứu", cat: "Bài 1" },
+      { ja: "だいがく", vi: "Trường đại học", cat: "Bài 1" },
+      { ja: "びょういん", vi: "Bệnh viện", cat: "Bài 1" },
+      { ja: "だれ", vi: "Ai", cat: "Bài 1" },
+      { ja: "どなた", vi: "Vị nào", cat: "Bài 1" },
+      { ja: "ーさい", vi: "~ tuổi", cat: "Bài 1" },
+      { ja: "なんさい", vi: "Mấy tuổi", cat: "Bài 1" },
+      { ja: "おいくつ", vi: "Bao nhiêu tuổi", cat: "Bài 1" },
+      { ja: "はい", vi: "Vâng, dạ", cat: "Bài 1" },
+      { ja: "いいえ", vi: "Không", cat: "Bài 1" },
+      { ja: "はじめまして", vi: "Rất hân hạnh được gặp anh/chị", cat: "Bài 1" },
+      { ja: "～からきました", vi: "(Tôi) đến từ~", cat: "Bài 1" },
+      { ja: "どうぞよろしくおねがいします", vi: "Rất mong nhận được sự giúp đỡ của anh/chị", cat: "Bài 1" },
+      { ja: "しつれいですが", vi: "Xin lỗi,...", cat: "Bài 1" },
+      { ja: "おなまえは？", vi: "Tên anh/chị là gì?", cat: "Bài 1" },
+
+      // Bài 2
+      { ja: "これ", vi: "Cái này (vật gần người nói)", cat: "Bài 2" },
+      { ja: "それ", vi: "Cái đó (vật gần người nghe)", cat: "Bài 2" },
+      { ja: "あれ", vi: "Cái kia (vật xa cả người nói lẫn người nghe)", cat: "Bài 2" },
+      { ja: "この", vi: "~ này", cat: "Bài 2" },
+      { ja: "その", vi: "~ đó", cat: "Bài 2" },
+      { ja: "あの", vi: "~ kia", cat: "Bài 2" },
+      { ja: "ほん", vi: "Sách", cat: "Bài 2" },
+      { ja: "じしょ", vi: "Từ điển", cat: "Bài 2" },
+      { ja: "ざっし", vi: "Tạp chí", cat: "Bài 2" },
+      { ja: "しんぶん", vi: "Tờ báo", cat: "Bài 2" },
+      { ja: "ノート", vi: "Vở ghi", cat: "Bài 2" },
+      { ja: "てちょう", vi: "Sổ tay", cat: "Bài 2" },
+      { ja: "めいし", vi: "Danh thiếp", cat: "Bài 2" },
+      { ja: "カード", vi: "Thẻ, cạc", cat: "Bài 2" },
+      { ja: "えんぴつ", vi: "Bút chì", cat: "Bài 2" },
+      { ja: "ボールペン", vi: "Bút bi", cat: "Bài 2" },
+      { ja: "シャープペンシル", vi: "Bút chì kim", cat: "Bài 2" },
+      { ja: "かぎ", vi: "Chìa khóa", cat: "Bài 2" },
+      { ja: "とけい", vi: "Đồng hồ", cat: "Bài 2" },
+      { ja: "かさ", vi: "Cái ô", cat: "Bài 2" },
+      { ja: "かばん", vi: "Cặp sách, túi sách", cat: "Bài 2" },
+      { ja: "CD", vi: "Đĩa CD", cat: "Bài 2" },
+      { ja: "テレビ", vi: "Tivi", cat: "Bài 2" },
+      { ja: "ラジオ", vi: "Radio", cat: "Bài 2" },
+      { ja: "カメラ", vi: "Máy ảnh", cat: "Bài 2" },
+      { ja: "コンピューター", vi: "Máy vi tính", cat: "Bài 2" },
+      { ja: "くるま", vi: "Ô tô, xe hơi", cat: "Bài 2" },
+      { ja: "つくえ", vi: "Bàn học / làm việc", cat: "Bài 2" },
+      { ja: "いす", vi: "Ghế", cat: "Bài 2" },
+      { ja: "チョコレート", vi: "Socola", cat: "Bài 2" },
+      { ja: "コーヒー", vi: "Cà phê", cat: "Bài 2" },
+      { ja: "おみやげ", vi: "Quà (mua khi đi xa hoặc thăm nhà)", cat: "Bài 2" },
+      { ja: "えいご", vi: "Tiếng Anh", cat: "Bài 2" },
+      { ja: "にほんご", vi: "Tiếng Nhật", cat: "Bài 2" },
+      { ja: "なん", vi: "Gì, cái gì", cat: "Bài 2" },
+      { ja: "そう", vi: "Đúng, phải, đúng vậy", cat: "Bài 2" },
+      { ja: "あのう", vi: "À, ờ... (ngập ngừng)", cat: "Bài 2" },
+      { ja: "えっ", vi: "Hả?", cat: "Bài 2" },
+      { ja: "ほんのきもちです", vi: "Chỉ là chút lòng thành thôi", cat: "Bài 2" },
+      { ja: "どうぞ", vi: "Xin mời", cat: "Bài 2" },
+      { ja: "ありがとうございます", vi: "Xin chân thành cảm ơn", cat: "Bài 2" },
+      { ja: "そうですか", vi: "Thế à, vậy à", cat: "Bài 2" },
+      { ja: "ちがいます", vi: "Không phải, sai rồi", cat: "Bài 2" },
+      { ja: "あ", vi: "Ôi!", cat: "Bài 2" },
+
+      // Bài 3
+      { ja: "ここ", vi: "Chỗ này, đây", cat: "Bài 3" },
+      { ja: "そこ", vi: "Chỗ đó, đó", cat: "Bài 3" },
+      { ja: "あそこ", vi: "Chỗ kia, kia", cat: "Bài 3" },
+      { ja: "どこ", vi: "Chỗ nào, ở đâu", cat: "Bài 3" },
+      { ja: "こちら", vi: "Phía này, đằng này", cat: "Bài 3" },
+      { ja: "そちら", vi: "Phía đó, đằng đó", cat: "Bài 3" },
+      { ja: "あちら", vi: "Phía kia, đằng kia", cat: "Bài 3" },
+      { ja: "どちら", vi: "Phía nào, đằng nào", cat: "Bài 3" },
+      { ja: "きょうしつ", vi: "Lớp học, phòng học", cat: "Bài 3" },
+      { ja: "しょくどう", vi: "Nhà ăn", cat: "Bài 3" },
+      { ja: "じむしょ", vi: "Văn phòng", cat: "Bài 3" },
+      { ja: "かいぎしつ", vi: "Phòng họp", cat: "Bài 3" },
+      { ja: "うけつけ", vi: "Bộ phận lễ tân", cat: "Bài 3" },
+      { ja: "ロビー", vi: "Hành lang, đại sảnh", cat: "Bài 3" },
+      { ja: "へや", vi: "Căn phòng", cat: "Bài 3" },
+      { ja: "トイレ", vi: "Nhà vệ sinh", cat: "Bài 3" },
+      { ja: "おてあらい", vi: "Phòng vệ sinh (lịch sự)", cat: "Bài 3" },
+      { ja: "かいだん", vi: "Cầu thang", cat: "Bài 3" },
+      { ja: "エレベーター", vi: "Thang máy", cat: "Bài 3" },
+      { ja: "エスカレーター", vi: "Thang cuốn", cat: "Bài 3" },
+      { ja: "じどうはんばいき", vi: "Máy bán hàng tự động", cat: "Bài 3" },
+      { ja: "でんわ", vi: "Điện thoại", cat: "Bài 3" },
+      { ja: "おくに", vi: "Đất nước (của anh, chị)", cat: "Bài 3" },
+      { ja: "かいしゃ", vi: "Công ty", cat: "Bài 3" },
+      { ja: "うち", vi: "Nhà, thuộc về mình", cat: "Bài 3" },
+      { ja: "くつ", vi: "Giầy", cat: "Bài 3" },
+      { ja: "ネクタイ", vi: "Cà-vạt", cat: "Bài 3" },
+      { ja: "ワイン", vi: "Rượu vang", cat: "Bài 3" },
+      { ja: "うりば", vi: "Quầy bán hàng", cat: "Bài 3" },
+      { ja: "ちか", vi: "Tầng hầm", cat: "Bài 3" },
+      { ja: "なんがい", vi: "Tầng mấy", cat: "Bài 3" },
+      { ja: "いくら", vi: "Bao nhiêu tiền", cat: "Bài 3" },
+      { ja: "ひゃく", vi: "Trăm", cat: "Bài 3" },
+      { ja: "せん", vi: "Nghìn", cat: "Bài 3" },
+      { ja: "まん", vi: "Mười nghìn, vạn", cat: "Bài 3" },
+      { ja: "すみません", vi: "Xin lỗi", cat: "Bài 3" },
+      { ja: "どうも", vi: "Cảm ơn", cat: "Bài 3" },
+      { ja: "いらっしゃいませ", vi: "Xin chào quý khách", cat: "Bài 3" },
+      { ja: "じゃ", vi: "Vậy thì, thế thì", cat: "Bài 3" },
+
+      // Bài 4
+      { ja: "おきます", vi: "Thức dậy", cat: "Bài 4" },
+      { ja: "ねます", vi: "Ngủ", cat: "Bài 4" },
+      { ja: "はたらきます", vi: "Làm việc", cat: "Bài 4" },
+      { ja: "やすみます", vi: "Nghỉ ngơi", cat: "Bài 4" },
+      { ja: "べんきょうします", vi: "Học tập", cat: "Bài 4" },
+      { ja: "おわります", vi: "Kết thúc, xong", cat: "Bài 4" },
+      { ja: "デパート", vi: "Bách hóa", cat: "Bài 4" },
+      { ja: "ぎんこう", vi: "Ngân hàng", cat: "Bài 4" },
+      { ja: "ゆうびんきょく", vi: "Bưu điện", cat: "Bài 4" },
+      { ja: "としょかん", vi: "Thư viện", cat: "Bài 4" },
+      { ja: "びじゅつかん", vi: "Bảo tàng mỹ thuật", cat: "Bài 4" },
+      { ja: "いま", vi: "Bây giờ", cat: "Bài 4" },
+      { ja: "～じ", vi: "~ giờ", cat: "Bài 4" },
+      { ja: "～ふん", vi: "~ phút", cat: "Bài 4" },
+      { ja: "はん", vi: "Rưỡi, nửa", cat: "Bài 4" },
+      { ja: "なんじ", vi: "Mấy giờ", cat: "Bài 4" },
+      { ja: "なんぷん", vi: "Mấy phút", cat: "Bài 4" },
+      { ja: "ごぜん", vi: "Sáng (trước 12h trưa)", cat: "Bài 4" },
+      { ja: "ごご", vi: "Chiều (sau 12h trưa)", cat: "Bài 4" },
+      { ja: "あさ", vi: "Buổi sáng", cat: "Bài 4" },
+      { ja: "ひる", vi: "Buổi trưa", cat: "Bài 4" },
+      { ja: "ばん", vi: "Buổi tối", cat: "Bài 4" },
+      { ja: "おととい", vi: "Hôm kia", cat: "Bài 4" },
+      { ja: "きのう", vi: "Hôm qua", cat: "Bài 4" },
+      { ja: "きょう", vi: "Hôm nay", cat: "Bài 4" },
+      { ja: "あした", vi: "Ngày mai", cat: "Bài 4" },
+      { ja: "あさって", vi: "Ngày kia", cat: "Bài 4" },
+      { ja: "けさ", vi: "Sáng nay", cat: "Bài 4" },
+      { ja: "こんばん", vi: "Tối nay", cat: "Bài 4" },
+      { ja: "やすみ", vi: "Nghỉ, ngày nghỉ", cat: "Bài 4" },
+      { ja: "ひるやすみ", vi: "Nghỉ trưa", cat: "Bài 4" },
+      { ja: "しけん", vi: "Kỳ thi, kiểm tra", cat: "Bài 4" },
+      { ja: "かいぎ", vi: "Cuộc họp, hội nghị", cat: "Bài 4" },
+      { ja: "えいが", vi: "Phim, điện ảnh", cat: "Bài 4" },
+      { ja: "まいあさ", vi: "Mỗi sáng", cat: "Bài 4" },
+      { ja: "まいばん", vi: "Mỗi tối", cat: "Bài 4" },
+      { ja: "まいにち", vi: "Mỗi ngày", cat: "Bài 4" },
+      { ja: "げつようび", vi: "Thứ hai", cat: "Bài 4" },
+      { ja: "かようび", vi: "Thứ ba", cat: "Bài 4" },
+      { ja: "すいようび", vi: "Thứ tư", cat: "Bài 4" },
+      { ja: "もくようび", vi: "Thứ năm", cat: "Bài 4" },
+      { ja: "きんようび", vi: "Thứ sáu", cat: "Bài 4" },
+      { ja: "どようび", vi: "Thứ bảy", cat: "Bài 4" },
+      { ja: "にちようび", vi: "Chủ nhật", cat: "Bài 4" },
+      { ja: "なんようび", vi: "Thứ mấy", cat: "Bài 4" },
+      { ja: "～から", vi: "Từ ~", cat: "Bài 4" },
+      { ja: "～まで", vi: "Đến ~", cat: "Bài 4" },
+      { ja: "～と～", vi: "Và (nối danh từ)", cat: "Bài 4" },
+      { ja: "たいへんですね", vi: "Vất vả quá nhỉ", cat: "Bài 4" },
+      { ja: "ばんごう", vi: "Số (số điện thoại,...)", cat: "Bài 4" },
+      { ja: "なんばん", vi: "Số mấy, số bao nhiêu", cat: "Bài 4" },
+      { ja: "そちら", vi: "Phía ông/bà, nơi của ông/bà", cat: "Bài 4" }
+    ];
+
+    // --- GAME STATE ---
+    let activeCategory = "ALL";
+    let currentScore = 0;
+    let currentStreak = 0;
+    let currentVocabList = [...ALL_VOCAB];
+
+    // Web Audio Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'win') {
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+          osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.5);
+        }
+      } catch(e){}
+    }
+
+    // Text To Speech
+    function speakJapanese(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/（.*?）/g, '').replace(/「|」/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Score helpers
+    function addScore(points) {
+      currentStreak++;
+      currentScore += points * Math.min(currentStreak, 5);
+      document.getElementById('totalScore').innerText = currentScore;
+      document.getElementById('streakCount').innerText = currentStreak;
+    }
+
+    function resetStreak() {
+      currentStreak = 0;
+      document.getElementById('streakCount').innerText = 0;
+    }
+
+    // Filter by Category
+    function filterCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        if (btn.innerText.includes(cat) || (cat === 'ALL' && btn.innerText.includes('Tất cả'))) {
+          btn.className = "cat-filter-btn px-3 py-1.5 rounded-full bg-rose-500 text-white font-medium whitespace-nowrap";
+        } else {
+          btn.className = "cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap";
+        }
+      });
+
+      if (cat === 'ALL') {
+        currentVocabList = [...ALL_VOCAB];
+      } else {
+        currentVocabList = ALL_VOCAB.filter(v => v.cat === cat);
+      }
+
+      const activeTab = document.querySelector('.tab-btn.active').id;
+      if (activeTab === 'tab-matching') initMatchingGame();
+      if (activeTab === 'tab-quiz') initQuizGame();
+      if (activeTab === 'tab-memory') initMemoryGame();
+      if (activeTab === 'tab-typing') initTypingGame();
+    }
+
+    // Switch Tabs
+    function switchMode(mode) {
+      document.querySelectorAll('.game-mode').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = "tab-btn py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200";
+      });
+
+      document.getElementById(`mode-${mode}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${mode}`);
+      activeBtn.className = "tab-btn active py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-indigo-600 text-white shadow-md";
+
+      if (mode === 'matching') initMatchingGame();
+      if (mode === 'quiz') initQuizGame();
+      if (mode === 'memory') initMemoryGame();
+      if (mode === 'typing') initTypingGame();
+    }
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    // ==========================================
+    // GAME MODE 1: MATCHING PAIRS
+    // ==========================================
+    let selectedJa = null;
+    let selectedVi = null;
+    let matchedPairsCount = 0;
+    let totalMatchingPairs = 5;
+
+    function initMatchingGame() {
+      selectedJa = null;
+      selectedVi = null;
+      matchedPairsCount = 0;
+
+      const jaListContainer = document.getElementById('match-ja-list');
+      const viListContainer = document.getElementById('match-vi-list');
+      jaListContainer.innerHTML = '';
+      viListContainer.innerHTML = '';
+
+      const items = shuffle(currentVocabList).slice(0, 5);
+      totalMatchingPairs = items.length;
+
+      const jaShuffled = shuffle(items);
+      const viShuffled = shuffle(items);
+
+      jaShuffled.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = "match-btn-ja w-full p-3.5 rounded-xl bg-slate-800 border-2 border-slate-700 text-white font-semibold text-sm sm:text-base text-left hover:border-indigo-500 transition flex items-center justify-between";
+        btn.dataset.ja = item.ja;
+        btn.innerHTML = `
+          <span>${item.ja}</span>
+          <i class="fa-solid fa-volume-high text-xs text-slate-500 hover:text-indigo-400 p-1" onclick="event.stopPropagation(); speakJapanese('${item.ja}')"></i>
+        `;
+        btn.onclick = () => selectMatchingJa(btn, item);
+        jaListContainer.appendChild(btn);
+      });
+
+      viShuffled.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = "match-btn-vi w-full p-3.5 rounded-xl bg-slate-800 border-2 border-slate-700 text-slate-200 font-medium text-xs sm:text-sm text-left hover:border-indigo-500 transition";
+        btn.dataset.ja = item.ja;
+        btn.innerText = item.vi;
+        btn.onclick = () => selectMatchingVi(btn, item);
+        viListContainer.appendChild(btn);
+      });
+
+      document.getElementById('match-progress').innerText = `Đã ghép đúng: 0 / ${totalMatchingPairs} cặp`;
+    }
+
+    function selectMatchingJa(btn, item) {
+      speakJapanese(item.ja);
+      document.querySelectorAll('.match-btn-ja').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-950/50'));
+      btn.classList.add('border-indigo-500', 'bg-indigo-950/50');
+      selectedJa = { btn, item };
+      checkMatchingPair();
+    }
+
+    function selectMatchingVi(btn, item) {
+      document.querySelectorAll('.match-btn-vi').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-950/50'));
+      btn.classList.add('border-indigo-500', 'bg-indigo-950/50');
+      selectedVi = { btn, item };
+      checkMatchingPair();
+    }
+
+    function checkMatchingPair() {
+      if (selectedJa && selectedVi) {
+        if (selectedJa.item.ja === selectedVi.item.ja) {
+          playSound('correct');
+          addScore(10);
+
+          selectedJa.btn.className = "w-full p-3.5 rounded-xl bg-emerald-950/40 border-2 border-emerald-500 text-emerald-300 font-semibold text-sm sm:text-base text-left opacity-60 cursor-default flex items-center justify-between";
+          selectedVi.btn.className = "w-full p-3.5 rounded-xl bg-emerald-950/40 border-2 border-emerald-500 text-emerald-300 font-medium text-xs sm:text-sm text-left opacity-60 cursor-default";
+          
+          selectedJa.btn.disabled = true;
+          selectedVi.btn.disabled = true;
+
+          selectedJa = null;
+          selectedVi = null;
+          matchedPairsCount++;
+
+          document.getElementById('match-progress').innerText = `Đã ghép đúng: ${matchedPairsCount} / ${totalMatchingPairs} cặp`;
+
+          if (matchedPairsCount === totalMatchingPairs) {
+            playSound('win');
+            setTimeout(() => {
+              alert("🎉 Màn chơi hoàn tất! Tiếp tục ván tiếp theo.");
+              initMatchingGame();
+            }, 400);
+          }
+        } else {
+          playSound('wrong');
+          resetStreak();
+          const jBtn = selectedJa.btn;
+          const vBtn = selectedVi.btn;
+          
+          jBtn.classList.add('border-rose-500', 'bg-rose-950/50');
+          vBtn.classList.add('border-rose-500', 'bg-rose-950/50');
+
+          setTimeout(() => {
+            jBtn.classList.remove('border-indigo-500', 'bg-indigo-950/50', 'border-rose-500', 'bg-rose-950/50');
+            vBtn.classList.remove('border-indigo-500', 'bg-indigo-950/50', 'border-rose-500', 'bg-rose-950/50');
+          }, 500);
+
+          selectedJa = null;
+          selectedVi = null;
+        }
+      }
+    }
+
+    // ==========================================
+    // GAME MODE 2: SPEED QUIZ
+    // ==========================================
+    let currentQuizItem = null;
+    let quizTimerInterval = null;
+    let quizTimeRemaining = 100;
+
+    function initQuizGame() {
+      if (quizTimerInterval) clearInterval(quizTimerInterval);
+
+      currentQuizItem = shuffle(currentVocabList)[0];
+      speakJapanese(currentQuizItem.ja);
+
+      document.getElementById('quiz-question-text').innerText = currentQuizItem.ja;
+      document.getElementById('quiz-category').innerText = currentQuizItem.cat;
+
+      const wrongPool = ALL_VOCAB.filter(v => v.ja !== currentQuizItem.ja);
+      const distractors = shuffle(wrongPool).slice(0, 3);
+      const options = shuffle([currentQuizItem, ...distractors]);
+
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "p-4 rounded-xl bg-slate-800 border-2 border-slate-700 hover:border-indigo-500 text-slate-100 font-semibold text-center transition hover:scale-[1.02] active:scale-[0.98]";
+        btn.innerText = opt.vi;
+        btn.onclick = () => handleQuizAnswer(opt, btn);
+        container.appendChild(btn);
+      });
+
+      quizTimeRemaining = 100;
+      const timerBar = document.getElementById('quiz-timer-bar');
+      timerBar.style.width = '100%';
+
+      quizTimerInterval = setInterval(() => {
+        quizTimeRemaining -= 2;
+        timerBar.style.width = `${quizTimeRemaining}%`;
+
+        if (quizTimeRemaining <= 0) {
+          clearInterval(quizTimerInterval);
+          playSound('wrong');
+          resetStreak();
+          highlightQuizCorrectAnswer();
+          setTimeout(initQuizGame, 1200);
+        }
+      }, 150);
+    }
+
+    function speakCurrentWord() {
+      if (currentQuizItem) speakJapanese(currentQuizItem.ja);
+    }
+
+    function handleQuizAnswer(selectedOption, btn) {
+      clearInterval(quizTimerInterval);
+
+      if (selectedOption.ja === currentQuizItem.ja) {
+        playSound('correct');
+        addScore(15);
+        btn.className = "p-4 rounded-xl bg-emerald-600 border-2 border-emerald-400 text-white font-semibold text-center animate-pulse-green";
+        setTimeout(initQuizGame, 800);
+      } else {
+        playSound('wrong');
+        resetStreak();
+        btn.className = "p-4 rounded-xl bg-rose-600 border-2 border-rose-400 text-white font-semibold text-center";
+        highlightQuizCorrectAnswer();
+        setTimeout(initQuizGame, 1400);
+      }
+    }
+
+    function highlightQuizCorrectAnswer() {
+      document.querySelectorAll('#quiz-options-container button').forEach(btn => {
+        if (btn.innerText === currentQuizItem.vi) {
+          btn.className = "p-4 rounded-xl bg-emerald-600 border-2 border-emerald-400 text-white font-semibold text-center";
+        }
+      });
+    }
+
+    // ==========================================
+    // GAME MODE 3: MEMORY FLIP
+    // ==========================================
+    let memoryFlippedCards = [];
+    let memoryMatchedCount = 0;
+    let memoryMovesCount = 0;
+
+    function initMemoryGame() {
+      memoryFlippedCards = [];
+      memoryMatchedCount = 0;
+      memoryMovesCount = 0;
+      document.getElementById('memory-moves').innerText = 0;
+
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+
+      const selectedVocab = shuffle(currentVocabList).slice(0, 6);
+      
+      let cardsData = [];
+      selectedVocab.forEach((item, index) => {
+        cardsData.push({ id: index, type: 'JA', text: item.ja, matchJa: item.ja });
+        cardsData.push({ id: index, type: 'VI', text: item.vi, matchJa: item.ja });
+      });
+
+      cardsData = shuffle(cardsData);
+
+      cardsData.forEach(cardInfo => {
+        const cardEl = document.createElement('div');
+        cardEl.className = "memory-card h-24 sm:h-28 perspective-1000 cursor-pointer";
+        cardEl.innerHTML = `
+          <div class="card-inner w-full h-full relative transform-style-3d transition-transform duration-300">
+            <div class="card-front absolute inset-0 bg-slate-800 border-2 border-slate-700 rounded-xl flex items-center justify-center text-indigo-400 text-xl font-bold backface-hidden shadow-md">
+              <i class="fa-solid fa-question"></i>
+            </div>
+            <div class="card-back absolute inset-0 bg-indigo-900 border-2 border-indigo-500 rounded-xl flex items-center justify-center p-2 text-center text-white font-semibold text-xs sm:text-sm rotate-y-180 backface-hidden shadow-lg overflow-hidden">
+              ${cardInfo.text}
+            </div>
+          </div>
+        `;
+
+        cardEl.onclick = () => flipMemoryCard(cardEl, cardInfo);
+        grid.appendChild(cardEl);
+      });
+    }
+
+    function flipMemoryCard(cardEl, cardInfo) {
+      if (memoryFlippedCards.length >= 2) return;
+      if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+
+      cardEl.classList.add('flipped');
+      cardEl.querySelector('.card-inner').style.transform = 'rotateY(180deg)';
+
+      if (cardInfo.type === 'JA') speakJapanese(cardInfo.text);
+
+      memoryFlippedCards.push({ cardEl, cardInfo });
+
+      if (memoryFlippedCards.length === 2) {
+        memoryMovesCount++;
+        document.getElementById('memory-moves').innerText = memoryMovesCount;
+
+        const [c1, c2] = memoryFlippedCards;
+
+        if (c1.cardInfo.matchJa === c2.cardInfo.matchJa) {
+          playSound('correct');
+          addScore(12);
+
+          c1.cardEl.classList.add('matched');
+          c2.cardEl.classList.add('matched');
+
+          c1.cardEl.querySelector('.card-back').className = "card-back absolute inset-0 bg-emerald-900 border-2 border-emerald-500 rounded-xl flex items-center justify-center p-2 text-center text-emerald-200 font-semibold text-xs sm:text-sm rotate-y-180 backface-hidden shadow-lg opacity-80 overflow-hidden";
+          c2.cardEl.querySelector('.card-back').className = "card-back absolute inset-0 bg-emerald-900 border-2 border-emerald-500 rounded-xl flex items-center justify-center p-2 text-center text-emerald-200 font-semibold text-xs sm:text-sm rotate-y-180 backface-hidden shadow-lg opacity-80 overflow-hidden";
+
+          memoryFlippedCards = [];
+          memoryMatchedCount += 2;
+
+          if (memoryMatchedCount === 12) {
+            playSound('win');
+            setTimeout(() => {
+              alert(`🎉 Hoàn thành màn lật thẻ sau ${memoryMovesCount} lượt thử!`);
+              initMemoryGame();
+            }, 500);
+          }
+        } else {
+          playSound('wrong');
+          resetStreak();
+          setTimeout(() => {
+            c1.cardEl.classList.remove('flipped');
+            c2.cardEl.classList.remove('flipped');
+            c1.cardEl.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
+            c2.cardEl.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
+            memoryFlippedCards = [];
+          }, 900);
+        }
+      }
+    }
+
+    // ==========================================
+    // GAME MODE 4: TYPING PRACTICE
+    // ==========================================
+    let currentTypingItem = null;
+
+    function initTypingGame() {
+      currentTypingItem = shuffle(currentVocabList)[0];
+
+      document.getElementById('typing-vi-question').innerText = currentTypingItem.vi;
+      document.getElementById('typing-category').innerText = currentTypingItem.cat;
+      
+      const inputEl = document.getElementById('typing-input');
+      inputEl.value = '';
+      inputEl.className = "w-full px-4 py-3.5 bg-slate-900 border-2 border-slate-700 focus:border-indigo-500 rounded-xl text-white text-center text-lg font-medium outline-none transition placeholder:text-slate-600";
+      inputEl.focus();
+
+      const feedbackEl = document.getElementById('typing-feedback');
+      feedbackEl.innerText = '';
+      feedbackEl.className = "mt-4 text-sm font-semibold min-h-[24px]";
+    }
+
+    // Chuẩn hóa chuỗi gõ để so sánh chính xác hơn
+    function cleanString(str) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[\s\・\?\？\！\!\.\,\-〜～]/g, '')
+        .replace(/（.*?）/g, '');
+    }
+
+    function checkTypingAnswer(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('typing-input');
+      const feedbackEl = document.getElementById('typing-feedback');
+      const userVal = cleanString(inputEl.value);
+      const targetVal = cleanString(currentTypingItem.ja);
+
+      if (!userVal) return;
+
+      if (userVal === targetVal) {
+        playSound('correct');
+        speakJapanese(currentTypingItem.ja);
+        addScore(20);
+
+        inputEl.className = "w-full px-4 py-3.5 bg-emerald-950/80 border-2 border-emerald-500 rounded-xl text-emerald-200 text-center text-lg font-bold outline-none transition animate-pulse-green";
+        feedbackEl.className = "mt-4 text-sm font-semibold text-emerald-400";
+        feedbackEl.innerText = `Chính xác! (${currentTypingItem.ja})`;
+
+        setTimeout(() => {
+          initTypingGame();
+        }, 1200);
+      } else {
+        playSound('wrong');
+        resetStreak();
+
+        inputEl.className = "w-full px-4 py-3.5 bg-rose-950/80 border-2 border-rose-500 rounded-xl text-rose-200 text-center text-lg font-bold outline-none transition";
+        feedbackEl.className = "mt-4 text-sm font-semibold text-rose-400";
+        feedbackEl.innerText = `Chưa đúng rồi! Hãy thử lại hoặc bấm "Gợi ý"`;
+
+        setTimeout(() => {
+          inputEl.className = "w-full px-4 py-3.5 bg-slate-900 border-2 border-slate-700 focus:border-indigo-500 rounded-xl text-white text-center text-lg font-medium outline-none transition placeholder:text-slate-600";
+        }, 800);
+      }
+    }
+
+    function showTypingHint() {
+      const feedbackEl = document.getElementById('typing-feedback');
+      const hintLength = Math.max(1, Math.floor(currentTypingItem.ja.length / 2));
+      const hintText = currentTypingItem.ja.substring(0, hintLength);
+      
+      speakJapanese(currentTypingItem.ja);
+      feedbackEl.className = "mt-4 text-sm font-semibold text-amber-400";
+      feedbackEl.innerText = `Gợi ý: Bắt đầu bằng "${hintText}..." (${currentTypingItem.ja.length} ký tự)`;
+    }
+
+    // Start default mode on load
+    window.onload = () => {
+      initMatchingGame();
+    };
+  </script>
+</body>
+</html>
