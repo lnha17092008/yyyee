@@ -98,6 +98,7 @@
       <button onclick="filterCategory('Bài 3')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 3: Địa điểm & Con số</button>
       <button onclick="filterCategory('Bài 4')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 4: Thời gian và động từ</button>
       <button onclick="filterCategory('Bài 5')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 5: Đi lại & Thời gian</button>
+      <button onclick="filterCategory('Bài 6')" class="cat-filter-btn px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium whitespace-nowrap">Bài 6: Động từ & Sinh hoạt</button>
     </div>
 
     <!-- GAME MODE 1: MATCHING PAIRS -->
@@ -459,7 +460,59 @@
       { ja: "つぎの", vi: "Tiếp theo", cat: "Bài 5" },
       { ja: "ふつう", vi: "Tàu thường", cat: "Bài 5" },
       { ja: "きゅうこう", vi: "Tàu tốc hành", cat: "Bài 5" },
-      { ja: "とっきゅう", vi: "Tàu tốc hành đặc biệt", cat: "Bài 5" }
+      { ja: "とっきゅう", vi: "Tàu tốc hành đặc biệt", cat: "Bài 5" },
+      
+      // Bài 6
+      { ja: "たべます", vi: "Ăn", cat: "Bài 6" },
+      { ja: "のみます", vi: "Uống", cat: "Bài 6" },
+      { ja: "すいます", vi: "Hút (thuốc lá)", cat: "Bài 6" },
+      { ja: "みます", vi: "Xem, nhìn", cat: "Bài 6" },
+      { ja: "ききます", vi: "Nghe", cat: "Bài 6" },
+      { ja: "よみます", vi: "Đọc", cat: "Bài 6" },
+      { ja: "かきます", vi: "Viết, vẽ", cat: "Bài 6" },
+      { ja: "かいます", vi: "Mua", cat: "Bài 6" },
+      { ja: "とります", vi: "Chụp (ảnh)", cat: "Bài 6" },
+      { ja: "します", vi: "Làm, chơi", cat: "Bài 6" },
+      { ja: "あいます", vi: "Gặp (bạn)", cat: "Bài 6" },
+      { ja: "ごはん", vi: "Cơm, bữa ăn", cat: "Bài 6" },
+      { ja: "あさごはん", vi: "Cơm sáng", cat: "Bài 6" },
+      { ja: "ひるごはん", vi: "Cơm trưa", cat: "Bài 6" },
+      { ja: "ばんごはん", vi: "Cơm tối", cat: "Bài 6" },
+      { ja: "パン", vi: "Bánh mì", cat: "Bài 6" },
+      { ja: "たまご", vi: "Trứng", cat: "Bài 6" },
+      { ja: "にく", vi: "Thịt", cat: "Bài 6" },
+      { ja: "さかな", vi: "Cá", cat: "Bài 6" },
+      { ja: "やさい", vi: "Rau", cat: "Bài 6" },
+      { ja: "くだもの", vi: "Trái cây", cat: "Bài 6" },
+      { ja: "みず", vi: "Nước", cat: "Bài 6" },
+      { ja: "おちゃ", vi: "Trà", cat: "Bài 6" },
+      { ja: "こうちゃ", vi: "Trà đen", cat: "Bài 6" },
+      { ja: "ぎゅうにゅう", vi: "Sữa bò", cat: "Bài 6" },
+      { ja: "ジュース", vi: "Nước hoa quả", cat: "Bài 6" },
+      { ja: "ビール", vi: "Bia", cat: "Bài 6" },
+      { ja: "おさけ", vi: "Rượu", cat: "Bài 6" },
+      { ja: "たばこ", vi: "Thuốc lá", cat: "Bài 6" },
+      { ja: "てがみ", vi: "Thư", cat: "Bài 6" },
+      { ja: "レポート", vi: "Báo cáo", cat: "Bài 6" },
+      { ja: "しゃしん", vi: "Ảnh", cat: "Bài 6" },
+      { ja: "ビデオ", vi: "Băng video", cat: "Bài 6" },
+      { ja: "みせ", vi: "Cửa hàng, tiệm", cat: "Bài 6" },
+      { ja: "にわ", vi: "Sân, vườn", cat: "Bài 6" },
+      { ja: "しゅくだい", vi: "Bài tập về nhà", cat: "Bài 6" },
+      { ja: "テニス", vi: "Quần vợt", cat: "Bài 6" },
+      { ja: "サッカー", vi: "Bóng đá", cat: "Bài 6" },
+      { ja: "おはなみ", vi: "Ngắm hoa", cat: "Bài 6" },
+      { ja: "なに", vi: "Cái gì", cat: "Bài 6" },
+      { ja: "いっしょに", vi: "Cùng nhau", cat: "Bài 6" },
+      { ja: "ちょっと", vi: "Một chút", cat: "Bài 6" },
+      { ja: "いつも", vi: "Luôn luôn", cat: "Bài 6" },
+      { ja: "ときどき", vi: "Thỉnh thoảng", cat: "Bài 6" },
+      { ja: "それから", vi: "Sau đó", cat: "Bài 6" },
+      { ja: "ええ", vi: "Vâng (thân mật)", cat: "Bài 6" },
+      { ja: "いいですね", vi: "Hay quá, được đấy nhỉ", cat: "Bài 6" },
+      { ja: "わかりました", vi: "Tôi hiểu rồi", cat: "Bài 6" },
+      { ja: "なんですか", vi: "Cái gì thế ạ?", cat: "Bài 6" },
+      { ja: "じゃまたあした", vi: "Hẹn gặp lại ngày mai", cat: "Bài 6" }
     ];
 
     // --- GAME STATE ---
